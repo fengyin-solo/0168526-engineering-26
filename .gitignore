@@ -90,3 +90,8 @@ coverage/
 .turbo
 .next
 .nuxt
+
+# Playwright
+playwright-report/
+test-results/
+.browser-libs/

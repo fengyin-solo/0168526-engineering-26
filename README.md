@@ -143,7 +143,44 @@ npm run build        # 生产构建
 npm run preview      # 预览生产版本
 npm run lint         # ESLint 检查
 npm run test         # 运行测试
+npm run check:ui     # 界面回归检查（见下节）
 ```
+
+## 界面回归检查
+
+每次改完界面后，一条命令跑完整套确认流程，替代手工逐项核对：
+
+```bash
+npm run check:ui          # 跑完整检查流程
+npm run check:ui:report   # 查看上一次的 HTML 报告（含失败截图与 trace）
+```
+
+流程会自动完成以下步骤，任何一步失败都会指出**是哪一步、什么原因**，并以非零退出码结束：
+
+1. 自动构建并启动生产服务（无需手工起服务）
+2. 在**宽屏（1280×800）与窄屏（375×812）**两套视口下执行同一套检查，两边结论一致才算通过
+3. 逐步确认：
+   - 页面加载完成、整体布局无横向溢出
+   - 视口专属元素正确（宽屏显示侧边栏 / 窄屏显示移动端头部与菜单按钮）
+   - 窄屏抽屉：能打开、内容完整、在视口内、能关闭
+   - 设置面板：能打开、API 配置 / 模型设置 / 参数调整三段完整、在视口内、能关闭
+   - 模板库：能打开、内容完整、在视口内、能关闭
+   - 收尾：所有面板关闭后布局仍无横向溢出
+
+每个用例都在全新的浏览器上下文中运行，并在页面脚本执行前清空 localStorage，**不携带上一轮的中间结果**，修好后直接重跑即可。
+
+### 环境准备
+
+首次运行需要安装 Playwright 浏览器：
+
+```bash
+npx playwright install chromium        # 下载浏览器
+npx playwright install-deps chromium   # 安装系统依赖（需要 root）
+```
+
+无 root 权限的环境（如部分容器）可改用本地依赖库：把缺失的 `.deb` 包解压到
+`.browser-libs/root/`（保持 `usr/lib/...` 目录结构），`scripts/check-ui.sh`
+会自动将其加入 `LD_LIBRARY_PATH`。
 
 ## License
 
