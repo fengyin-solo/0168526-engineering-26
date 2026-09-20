@@ -143,7 +143,31 @@ npm run build        # 生产构建
 npm run preview      # 预览生产版本
 npm run lint         # ESLint 检查
 npm run test         # 运行测试
+npm run test:e2e     # 界面确认检查流程（Playwright，自动起停服务）
+npm run test:e2e:report  # 查看上一次检查的 HTML 报告（含失败截图/轨迹）
 ```
+
+## 界面确认检查流程（E2E）
+
+把原先手工的确认环节固化成一条可反复执行的检查，代替"起服务 → 窄屏/宽屏 → 逐个点开抽屉/设置/模板面板"的人工流程：
+
+```bash
+# 首次使用：安装浏览器（常规环境）
+npx playwright install --with-deps chromium
+
+# 无 root 权限的环境：把依赖库解压到 ~/browser-libs
+# （或用 PLAYWRIGHT_CHROMIUM_LIBS 指向该目录），配置会自动识别
+npx playwright install chromium
+
+# 每次改完界面后运行
+npm run test:e2e
+```
+
+- 检查清单见 `tests/e2e/ui-checklist.check.ts`，与手工确认环节一一对应（页面可访问、布局形态、无横向溢出、抽屉、设置面板、模板面板、输入区不挤压）。
+- 同一份清单在**窄屏 375×812** 与**宽屏 1440×900** 下各执行一遍，两种布局必须得到同样的结论才算通过。
+- 任何一步超时或不通过，终端会列出失败的检查项、具体环节与原因；`npm run test:e2e:report` 可查看带截图和操作的轨迹。
+- 每个用例使用全新浏览器上下文（localStorage 为空），`test-results/` 每次运行前自动清空，修好后重跑不会留下上一回的中间结果。
+- dev 服务由检查流程自动启动与回收（端口 5199），无需手工起服务。
 
 ## License
 

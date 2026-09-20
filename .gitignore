@@ -90,3 +90,10 @@ coverage/
 .turbo
 .next
 .nuxt
+
+# ============================================
+# Playwright（界面检查流程输出，每次运行自动清理）
+# ============================================
+/test-results/
+/playwright-report/
+/playwright/.cache/
